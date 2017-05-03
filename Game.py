@@ -8,8 +8,10 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 
 initCredit = 0
+initBet = 0
+initWin = 0
 
-gameStats = [initCredit]
+gameStats = [initCredit, initBet, initWin]
 
 display_width = 1280
 display_height = 720
@@ -41,6 +43,7 @@ thePics = {
 
 font = pygame.font.Font('Fonts/freesansbold.ttf', 30)
 creditFont = pygame.font.Font('Fonts/digital-7italic.ttf', 50)
+inGameCreditFont = pygame.font.Font('Fonts/digital-7italic.ttf', 30)
 pygame.display.set_caption('Slot Machine: Deluxe Version')
 
 def introMenu():
@@ -127,6 +130,44 @@ def theGame():
                 keyPressed = True
                 pressed = pygame.key.get_pressed()
 
+        click = []
+
+        balanceDisp = inGameCreditFont.render('%d kr.' % gameStats[0], True, red)
+        balanceRect = balanceDisp.get_rect()
+        balanceRect.topleft = (250, 601)
+        screen.blit(balanceDisp, balanceRect)
+
+        winDisp = inGameCreditFont.render('%d kr.' % gameStats[2], True, red)
+        winRect = winDisp.get_rect()
+        winRect.topleft = (605, 601)
+        screen.blit(winDisp, winRect)
+
+        betDisp = inGameCreditFont.render('%d kr.' % gameStats[1], True, red)
+        betRect = betDisp.get_rect()
+        betRect.topleft = (940, 601)
+        screen.blit(betDisp, betRect)
+
+        plusDisp = inGameCreditFont.render('+', True, red)
+        plusRect = plusDisp.get_rect()
+        plusRect.topleft = (1058, 612)
+        screen.blit(plusDisp, plusRect)
+
+        minusDisp = inGameCreditFont.render('-', True, red)
+        minusRect = minusDisp.get_rect()
+        minusRect.topleft = (867, 612)
+        screen.blit(minusDisp, minusRect)
+
+        click.append(plusRect)
+        click.append(minusRect)
+
+        if mouseClicked and mousex > 25 and mousex < 120 and mousey > 670 and mousey < 710:
+            introMenu()
+        if mouseClicked and click[1].collidepoint(event.pos):
+            if gameStats[1] >= 10:
+                gameStats[1] -= 10
+        if mouseClicked and click[0].collidepoint(event.pos):
+            if gameStats[1] <= 90:
+                gameStats[1] += 10
 
         pygame.display.update()
         clock.tick(60)
