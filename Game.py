@@ -17,6 +17,28 @@ display_height = 720
 screen = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
 
+ARNAR = 1
+BJARKI = 2
+BIRGIR = 3
+DAVID = 4
+HAUKUR = 5
+HAVAR = 6
+VIDAR = 7
+TH = 8
+SHIT = 9
+
+thePics = {
+    ARNAR: pygame.image.load('Images/Arnar.png'),
+    BJARKI: pygame.image.load('Images/Bjarki.png'),
+    BIRGIR: pygame.image.load('Images/Birgir.png'),
+    DAVID: pygame.image.load('Images/David.jpg'),
+    HAUKUR: pygame.image.load('Images/Haukur.png'),
+    HAVAR: pygame.image.load('Images/Havar.png'),
+    VIDAR: pygame.image.load('Images/Viddi.png'),
+    TH: pygame.image.load('Images/TH.png'),
+    SHIT: pygame.image.load('Images/Bonus.jpg')
+}
+
 font = pygame.font.Font('Fonts/freesansbold.ttf', 30)
 creditFont = pygame.font.Font('Fonts/digital-7italic.ttf', 50)
 pygame.display.set_caption('Slot Machine: Deluxe Version')
@@ -84,6 +106,32 @@ def theGame():
     screen.fill(black)
     mousex = 0
     mousey = 0
+    run = True
+    background = pygame.image.load("Images/background.png")
+    while run:
+        mouseClicked = False
+        keyPressed = False
+        pressed = pygame.key.get_pressed()
+        screen.blit(background, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEMOTION:
+                mousex, mousey = event.pos
+                pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mouseClicked = True
+            if event.type == pygame.KEYDOWN:
+                keyPressed = True
+                pressed = pygame.key.get_pressed()
+
+
+        pygame.display.update()
+        clock.tick(60)
+
+
 
 def theRules(number):
     screen.fill(black)
