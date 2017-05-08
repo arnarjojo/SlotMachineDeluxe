@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 pygame.init()
 pygame.font.init()
@@ -6,6 +6,7 @@ pygame.font.init()
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
+green = (0, 255, 0)
 
 initCredit = 0
 initBet = 0
@@ -19,27 +20,41 @@ display_height = 720
 screen = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
 
+EMPTY = 0
 ARNAR = 1
 BJARKI = 2
 BIRGIR = 3
 DAVID = 4
-HAUKUR = 5
-HAVAR = 6
-VIDAR = 7
-TH = 8
+HAVAR = 5
+VIDAR = 6
+TH = 7
+HAUKUR = 8
 SHIT = 9
 
 thePics = {
+    EMPTY: pygame.image.load('Images/11.jpg'),
     ARNAR: pygame.image.load('Images/Arnar.png'),
     BJARKI: pygame.image.load('Images/Bjarki.png'),
     BIRGIR: pygame.image.load('Images/Birgir.png'),
-    DAVID: pygame.image.load('Images/David.jpg'),
-    HAUKUR: pygame.image.load('Images/Haukur.png'),
+    DAVID: pygame.image.load('Images/David.png'),
     HAVAR: pygame.image.load('Images/Havar.png'),
     VIDAR: pygame.image.load('Images/Viddi.png'),
     TH: pygame.image.load('Images/TH.png'),
-    SHIT: pygame.image.load('Images/Bonus.jpg')
+    HAUKUR: pygame.image.load('Images/Haukur.png'),
+    SHIT: pygame.image.load('Images/Bonus.png')
 }
+
+chances = {}
+
+chances['1'] = 5
+chances['2'] = 5
+chances['3'] = 5
+chances['4'] = 5
+chances['5'] = 5
+chances['6'] = 5
+chances['7'] = 2
+chances['8'] = 1
+chances['9'] = 1
 
 font = pygame.font.Font('Fonts/freesansbold.ttf', 30)
 creditFont = pygame.font.Font('Fonts/digital-7italic.ttf', 50)
@@ -102,76 +117,7 @@ def introMenu():
                 gameStats[0] += 1000
 
         pygame.display.update()
-        clock.tick(15)
-
-def theGame():
-    pygame.mixer.music.stop()
-    screen.fill(black)
-    mousex = 0
-    mousey = 0
-    run = True
-    background = pygame.image.load("Images/background.png")
-    while run:
-        mouseClicked = False
-        keyPressed = False
-        pressed = pygame.key.get_pressed()
-        screen.blit(background, (0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            elif event.type == pygame.MOUSEMOTION:
-                mousex, mousey = event.pos
-                pos = event.pos
-            elif event.type == pygame.MOUSEBUTTONUP:
-                mousex, mousey = event.pos
-                mouseClicked = True
-            if event.type == pygame.KEYDOWN:
-                keyPressed = True
-                pressed = pygame.key.get_pressed()
-
-        click = []
-
-        balanceDisp = inGameCreditFont.render('%d kr.' % gameStats[0], True, red)
-        balanceRect = balanceDisp.get_rect()
-        balanceRect.topleft = (250, 601)
-        screen.blit(balanceDisp, balanceRect)
-
-        winDisp = inGameCreditFont.render('%d kr.' % gameStats[2], True, red)
-        winRect = winDisp.get_rect()
-        winRect.topleft = (605, 601)
-        screen.blit(winDisp, winRect)
-
-        betDisp = inGameCreditFont.render('%d kr.' % gameStats[1], True, red)
-        betRect = betDisp.get_rect()
-        betRect.topleft = (940, 601)
-        screen.blit(betDisp, betRect)
-
-        plusDisp = inGameCreditFont.render('+', True, red)
-        plusRect = plusDisp.get_rect()
-        plusRect.topleft = (1058, 612)
-        screen.blit(plusDisp, plusRect)
-
-        minusDisp = inGameCreditFont.render('-', True, red)
-        minusRect = minusDisp.get_rect()
-        minusRect.topleft = (867, 612)
-        screen.blit(minusDisp, minusRect)
-
-        click.append(plusRect)
-        click.append(minusRect)
-
-        if mouseClicked and mousex > 25 and mousex < 120 and mousey > 670 and mousey < 710:
-            introMenu()
-        if mouseClicked and click[1].collidepoint(event.pos):
-            if gameStats[1] >= 10:
-                gameStats[1] -= 10
-        if mouseClicked and click[0].collidepoint(event.pos):
-            if gameStats[1] <= 90:
-                gameStats[1] += 10
-
-        pygame.display.update()
         clock.tick(60)
-
 
 
 def theRules(number):
@@ -215,6 +161,178 @@ def theRules(number):
                 theRules(1)
         pygame.display.update()
         clock.tick(15)
+
+
+def theGame():
+    pygame.mixer.music.stop()
+    screen.fill(black)
+    mousex = 0
+    mousey = 0
+    run = True
+    newBoard = True
+    background = pygame.image.load("Images/background.png")
+    board = {}
+    while run:
+        mouseClicked = False
+        keyPressed = False
+        pressed = pygame.key.get_pressed()
+        screen.blit(background, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEMOTION:
+                mousex, mousey = event.pos
+                pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mouseClicked = True
+            if event.type == pygame.KEYDOWN:
+                keyPressed = True
+                pressed = pygame.key.get_pressed()
+
+        click = []
+
+        if newBoard:
+            fillBoard(board)
+            checkWin(board)
+            gameStats[0] += gameStats[2]
+            newBoard = False
+
+        boardX = 112
+        boardY = 75
+        pos = 11
+        for item in board:
+            if pos == 16:
+                pos = 21
+                boardX = 112
+                boardY += 170
+            elif pos == 26:
+                boardX = 112
+                boardY += 170
+                pos = 31
+            screen.blit(thePics[int(board[str(pos)])], (boardX, boardY))
+            boardX += 210
+            pos += 1
+
+        balanceDisp = inGameCreditFont.render('%d kr.' % gameStats[0], True, red)
+        balanceRect = balanceDisp.get_rect()
+        balanceRect.topleft = (250, 601)
+        screen.blit(balanceDisp, balanceRect)
+
+        winDisp = inGameCreditFont.render('%d kr.' % gameStats[2], True, red)
+        winRect = winDisp.get_rect()
+        winRect.topleft = (605, 601)
+        screen.blit(winDisp, winRect)
+
+        betDisp = inGameCreditFont.render('%d kr.' % gameStats[1], True, red)
+        betRect = betDisp.get_rect()
+        betRect.topleft = (940, 601)
+        screen.blit(betDisp, betRect)
+
+        plusDisp = inGameCreditFont.render('+', True, red)
+        plusRect = plusDisp.get_rect()
+        plusRect.topleft = (1058, 612)
+        screen.blit(plusDisp, plusRect)
+
+        minusDisp = inGameCreditFont.render('-', True, red)
+        minusRect = minusDisp.get_rect()
+        minusRect.topleft = (867, 612)
+        screen.blit(minusDisp, minusRect)
+
+        spinDisp = creditFont.render('Spin!', True, green)
+        spinRect = spinDisp.get_rect()
+        spinRect.topleft = (1160, 670)
+        screen.blit(spinDisp, spinRect)
+
+        homeDisp = creditFont.render('Home', True, green)
+        homeRect = homeDisp.get_rect()
+        homeRect.topleft = (25, 670)
+        screen.blit(homeDisp, homeRect)
+
+        click.append(plusRect)
+        click.append(minusRect)
+        click.append(homeRect)
+        click.append(spinRect)
+        if mouseClicked:
+            print(str(mousex) + ", " + str(mousey))
+        if mouseClicked and click[2].collidepoint(event.pos):
+            introMenu()
+        if mouseClicked and click[1].collidepoint(event.pos):
+            if gameStats[1] >= 10:
+                gameStats[1] -= 10
+        if mouseClicked and click[0].collidepoint(event.pos):
+            if gameStats[1] <= 90:
+                gameStats[1] += 10
+        if mouseClicked and click[3].collidepoint(event.pos):
+            if gameStats[1] > 0 and gameStats[0] >= gameStats[1]:
+                gameStats[0] -= gameStats[1]
+                gameStats[2] = 0
+                newBoard = True
+
+        pygame.display.update()
+        clock.tick(10)
+
+
+def fillBoard(board):
+    for i in range(1, 16):
+        if i <= 5:
+            board['1' + str(i)] = getRandomBlock()
+        elif i > 5 and i <= 10:
+            board['2' + str(i-5)] = getRandomBlock()
+        else:
+            board['3' + str(i-10)] = getRandomBlock()
+
+
+
+
+def getRandomBlock():
+    return random.choice([x for x in chances for y in range(chances[x])])
+
+def checkWin(board):
+    ##Straight line
+    temp = board['11']
+    for i in range(12,16):
+        if temp == board[str(i)] or board[str(i)] == '7':
+            if i >= 13:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    temp = board['21']
+    for i in range(22,26):
+        if temp == board[str(i)] or board[str(i)] == '7':
+            if i >= 23:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    temp = board['31']
+    for i in range(32,36):
+        if temp == board[str(i)] or board[str(i)] == '7':
+            if i >= 33:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    ##Diagonal line
+    if board['11'] == board['22'] and board['22'] == board['33'] or board['11'] == board['33'] and board['22'] == '7' or board['11'] == board['22'] and board['33'] == '7' or board['22'] == board['33'] and board['11'] == '7':
+        if board['33'] == board['24'] or board['24'] == '7':
+            if board['24'] == board['15'] or board['15'] == '7':
+                gameStats[2] += gameStats[1]
+            gameStats[2] += gameStats[1]
+        gameStats[2] += gameStats[1]
+    if board['31'] == board['22'] and board['22'] == board['13'] or board['13'] == board['31'] and board['22'] == '7' or board['13'] == board['22'] and board['31'] == '7' or board['22'] == board['31'] and board['13'] == '7':
+        if board['13'] == board['24'] or board['24'] == '7':
+            if board['24'] == board['35'] or board['35'] == '7':
+                gameStats[2] += gameStats[1]
+            gameStats[2] += gameStats[1]
+        gameStats[2] += gameStats[1]
+
+
+    for key, value in board.items():
+        if value == '8':
+            gameStats[2] = gameStats[2]*2
 
 
 introMenu()
