@@ -427,10 +427,10 @@ def checkWin(board):
     for i in tempArr:
         if temp == '7':
             temp = board[str(i)]
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         elif temp == board[i] or board[i] == '7':
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         else:
             break
@@ -440,10 +440,10 @@ def checkWin(board):
     for i in tempArr:
         if temp == '7':
             temp = board[str(i)]
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         elif temp == board[i] or board[i] == '7':
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         else:
             break
@@ -454,10 +454,10 @@ def checkWin(board):
     for i in tempArr:
         if temp == '7':
             temp = board[str(i)]
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         elif temp == board[i] or board[i] == '7':
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         else:
             break
@@ -467,10 +467,10 @@ def checkWin(board):
     for i in tempArr:
         if temp == '7':
             temp = board[str(i)]
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         elif temp == board[i] or board[i] == '7':
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         else:
             break
@@ -494,18 +494,13 @@ def checkWin(board):
     for i in tempArr:
         if temp == '7':
             temp = board[str(i)]
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         elif temp == board[i] or board[i] == '7':
-            if tempArr.index(i) >= 2:
+            if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
         else:
             break
-
-    #Hauk's double
-    for key, value in board.items():
-        if value == '8':
-            gameStats[2] = gameStats[2]*2
 
     #Bonus game
     count = 0
@@ -514,6 +509,11 @@ def checkWin(board):
             count += 1
     if count >= 3:
         gameStats[2] += 1000 ##Needs bonus game implementation
+
+    # #Hauk's double
+    for key, value in board.items():
+        if value == '8':
+            gameStats[2] = gameStats[2]*2
 
 
 introMenu()
