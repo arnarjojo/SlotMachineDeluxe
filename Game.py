@@ -346,14 +346,18 @@ def theGame():
             if mouseClicked and doubleClicked[0].collidepoint(event.pos):
                 doublePressed = True
                 if theRandom <= 6:
+                    gameStats[0] += gameStats[2]
                     gameStats[2] = gameStats[2]*2
                 else:
+                    gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
             elif mouseClicked and doubleClicked[1].collidepoint(event.pos):
                 doublePressed = True
                 if theRandom >= 7:
+                    gameStats[0] += gameStats[2]
                     gameStats[2] = gameStats[2]*2
                 else:
+                    gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
         if len(clicked) > 0:
             if mouseClicked and clicked[0].collidepoint(event.pos) and gameStats[2] > 0:
