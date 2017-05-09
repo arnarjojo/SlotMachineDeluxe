@@ -1,5 +1,5 @@
 import pygame, random
-
+from random import randint
 pygame.init()
 pygame.font.init()
 
@@ -42,6 +42,36 @@ thePics = {
     TH: pygame.image.load('Images/TH.png'),
     HAUKUR: pygame.image.load('Images/Haukur.png'),
     SHIT: pygame.image.load('Images/Bonus.png')
+}
+
+EMPTY = 0
+KingD = 1
+KingH = 2
+KingC = 7
+KingS = 8
+QueenD = 3
+QueenH = 4
+QueenC = 9
+QueenS = 10
+JackD = 5
+JackH = 6
+JackC = 11
+JackS = 12
+
+theCards = {
+    EMPTY: pygame.image.load('Images/Cards/back.png'),
+    KingD: pygame.image.load('Images/Cards/KingD.png'),
+    KingH: pygame.image.load('Images/Cards/KingH.png'),
+    KingC: pygame.image.load('Images/Cards/KingC.png'),
+    KingS: pygame.image.load('Images/Cards/KingS.png'),
+    QueenD: pygame.image.load('Images/Cards/QueenD.png'),
+    QueenH: pygame.image.load('Images/Cards/QueenH.png'),
+    QueenC: pygame.image.load('Images/Cards/QueenC.png'),
+    QueenS: pygame.image.load('Images/Cards/QueenS.png'),
+    JackD: pygame.image.load('Images/Cards/JackD.png'),
+    JackH: pygame.image.load('Images/Cards/JackH.png'),
+    JackC: pygame.image.load('Images/Cards/JackC.png'),
+    JackS: pygame.image.load('Images/Cards/JackS.png')
 }
 
 chances = {}
@@ -171,7 +201,11 @@ def theGame():
     run = True
     newBoard = True
     background = pygame.image.load("Images/background.png")
+    doubleUpBack = pygame.image.load("Images/DoubleUp.png")
     board = {}
+    doubleUp = False
+    doublePressed = False
+    getDoubleUp = False
     while run:
         mouseClicked = False
         keyPressed = False
@@ -192,7 +226,6 @@ def theGame():
                 pressed = pygame.key.get_pressed()
 
         click = []
-
         if newBoard:
             fillBoard(board)
             checkWin(board)
@@ -214,6 +247,45 @@ def theGame():
             screen.blit(thePics[int(board[str(pos)])], (boardX, boardY))
             boardX += 210
             pos += 1
+
+        doubleClicked = []
+        if getDoubleUp:
+            theRandom = randint(1,12)
+            theCard = theCards[theRandom]
+            start_time = pygame.time.get_ticks()
+            getDoubleUp = False
+
+        if doubleUp:
+            screen.blit(doubleUpBack, (350, 100))
+            if doublePressed == False:
+                screen.blit(theCards[0], (530, 220))
+            else:
+                if pygame.time.get_ticks() - start_time < 3000:
+                    screen.blit(theCard, (500,200))
+                else:
+                    doublePressed = False
+                    doubleUp = False
+
+            redDisp = font.render('Red' , True, red)
+            redRect = redDisp.get_rect()
+            redRect.topleft = (750, 500)
+            screen.blit(redDisp, redRect)
+
+            blackDisp = font.render('Black' , True, black)
+            blackRect = blackDisp.get_rect()
+            blackRect.topleft = (400, 500)
+            screen.blit(blackDisp, blackRect)
+
+            doubleClicked.append(redRect)
+            doubleClicked.append(blackRect)
+
+        clicked = []
+        if gameStats[2] > 0:
+            doubleDisp = creditFont.render('Double Up!' , True, green)
+            doubleRect = doubleDisp.get_rect()
+            doubleRect.topleft = (530, 670)
+            screen.blit(doubleDisp, doubleRect)
+            clicked.append(doubleRect)
 
         balanceDisp = inGameCreditFont.render('%d kr.' % gameStats[0], True, red)
         balanceRect = balanceDisp.get_rect()
@@ -254,6 +326,7 @@ def theGame():
         click.append(minusRect)
         click.append(homeRect)
         click.append(spinRect)
+
         if mouseClicked:
             print(str(mousex) + ", " + str(mousey))
         if mouseClicked and click[2].collidepoint(event.pos):
@@ -269,6 +342,23 @@ def theGame():
                 gameStats[0] -= gameStats[1]
                 gameStats[2] = 0
                 newBoard = True
+        if doubleUp:
+            if mouseClicked and doubleClicked[0].collidepoint(event.pos):
+                doublePressed = True
+                if theRandom <= 6:
+                    gameStats[2] = gameStats[2]*2
+                else:
+                    gameStats[2] = 0
+            elif mouseClicked and doubleClicked[1].collidepoint(event.pos):
+                doublePressed = True
+                if theRandom >= 7:
+                    gameStats[2] = gameStats[2]*2
+                else:
+                    gameStats[2] = 0
+        if len(clicked) > 0:
+            if mouseClicked and clicked[0].collidepoint(event.pos) and gameStats[2] > 0:
+                doubleUp = True
+                getDoubleUp = True
 
         pygame.display.update()
         clock.tick(10)
@@ -293,7 +383,11 @@ def checkWin(board):
     ##Straight line
     temp = board['11']
     for i in range(12,16):
-        if temp == board[str(i)] or board[str(i)] == '7':
+        if temp == '7':
+            temp = board[str(i)]
+            if i >= 13:
+                gameStats[2] += gameStats[1]
+        elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 13:
                 gameStats[2] += gameStats[1]
         else:
@@ -301,7 +395,11 @@ def checkWin(board):
 
     temp = board['21']
     for i in range(22,26):
-        if temp == board[str(i)] or board[str(i)] == '7':
+        if temp == '7':
+            temp = board[str(i)]
+            if i >= 23:
+                gameStats[2] += gameStats[1]
+        elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 23:
                 gameStats[2] += gameStats[1]
         else:
@@ -309,30 +407,109 @@ def checkWin(board):
 
     temp = board['31']
     for i in range(32,36):
-        if temp == board[str(i)] or board[str(i)] == '7':
+        if temp == '7':
+            temp = board[str(i)]
+            if i >= 33:
+                gameStats[2] += gameStats[1]
+        elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 33:
                 gameStats[2] += gameStats[1]
         else:
             break
 
     ##Diagonal line
-    if board['11'] == board['22'] and board['22'] == board['33'] or board['11'] == board['33'] and board['22'] == '7' or board['11'] == board['22'] and board['33'] == '7' or board['22'] == board['33'] and board['11'] == '7':
-        if board['33'] == board['24'] or board['24'] == '7':
-            if board['24'] == board['15'] or board['15'] == '7':
+    tempArr = ['22', '33', '24', '15']
+    temp = board['11']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
                 gameStats[2] += gameStats[1]
-            gameStats[2] += gameStats[1]
-        gameStats[2] += gameStats[1]
-    if board['31'] == board['22'] and board['22'] == board['13'] or board['13'] == board['31'] and board['22'] == '7' or board['13'] == board['22'] and board['31'] == '7' or board['22'] == board['31'] and board['13'] == '7':
-        if board['13'] == board['24'] or board['24'] == '7':
-            if board['24'] == board['35'] or board['35'] == '7':
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
                 gameStats[2] += gameStats[1]
-            gameStats[2] += gameStats[1]
-        gameStats[2] += gameStats[1]
+        else:
+            break
 
+    tempArr = ['22', '13', '24', '35']
+    temp = board['31']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        else:
+            break
 
+    #Half-cut
+    tempArr = ['12', '23', '34', '35']
+    temp = board['11']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    tempArr = ['32', '23', '14', '15']
+    temp = board['31']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    #Pyramid
+    tempArr = ['32', '33', '34', '25']
+    temp = board['21']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    tempArr = ['12', '13', '14', '25']
+    temp = board['21']
+    for i in tempArr:
+        if temp == '7':
+            temp = board[str(i)]
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        elif temp == board[i] or board[i] == '7':
+            if tempArr.index(i) >= 2:
+                gameStats[2] += gameStats[1]
+        else:
+            break
+
+    #Hauk's double
     for key, value in board.items():
         if value == '8':
             gameStats[2] = gameStats[2]*2
+
+    #Bonus game
+    count = 0
+    for key, value in board.items():
+        if value == '9':
+            count += 1
+    if count >= 3:
+        gameStats[2] += 1000 ##Needs bonus game implementation
 
 
 introMenu()
