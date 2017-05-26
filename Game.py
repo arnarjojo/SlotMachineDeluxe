@@ -21,7 +21,6 @@ screen = pygame.display.set_mode((display_width, display_height))
 clock = pygame.time.Clock()
 
 EMPTY = 0
-ARNAR = 1
 BJARKI = 2
 BIRGIR = 3
 DAVID = 4
@@ -33,7 +32,6 @@ SHIT = 9
 
 thePics = {
     EMPTY: pygame.image.load('Images/11.jpg'),
-    ARNAR: pygame.image.load('Images/Arnar.png'),
     BJARKI: pygame.image.load('Images/Bjarki.png'),
     BIRGIR: pygame.image.load('Images/Birgir.png'),
     DAVID: pygame.image.load('Images/David.png'),
@@ -74,17 +72,36 @@ theCards = {
     JackS: pygame.image.load('Images/Cards/JackS.png')
 }
 
+ARNAR = 0
+ATLI = 1
+DANIEL = 2
+MARTIN = 3
+ULFUR = 4
+THOR = 5
+BACK = 6
+
+theBonusGuys = {
+    ARNAR: pygame.image.load('Images/Arnar.png'),
+    ATLI: pygame.image.load('Images/Atli.png'),
+    DANIEL: pygame.image.load('Images/Daniel.png'),
+    MARTIN: pygame.image.load('Images/Martin.png'),
+    ULFUR: pygame.image.load('Images/Ulfur.png'),
+    THOR: pygame.image.load('Images/Thor.png'),
+    SHIT: pygame.image.load('Images/Bonus.png'),
+    BACK: pygame.image.load('Images/Back.png')
+}
+
 chances = {}
 
-chances['1'] = 5
-chances['2'] = 5
-chances['3'] = 5
-chances['4'] = 5
-chances['5'] = 5
-chances['6'] = 5
+chances['2'] = 7
+chances['3'] = 7
+chances['4'] = 7
+chances['5'] = 7
+chances['6'] = 7
 chances['7'] = 2
 chances['8'] = 1
-chances['9'] = 1
+chances['9'] = 4
+
 
 font = pygame.font.Font('Fonts/freesansbold.ttf', 30)
 creditFont = pygame.font.Font('Fonts/digital-7italic.ttf', 50)
@@ -206,6 +223,7 @@ def theGame():
     doubleUp = False
     doublePressed = False
     getDoubleUp = False
+    spin = False
     while run:
         mouseClicked = False
         keyPressed = False
@@ -228,8 +246,10 @@ def theGame():
         click = []
         if newBoard:
             fillBoard(board)
-            checkWin(board)
-            gameStats[0] += gameStats[2]
+            if spin:
+                checkWin(board)
+                gameStats[0] += gameStats[2]
+                spin = False
             newBoard = False
 
         boardX = 112
@@ -327,13 +347,12 @@ def theGame():
         click.append(homeRect)
         click.append(spinRect)
 
-        if mouseClicked:
-            print(str(mousex) + ", " + str(mousey))
         if mouseClicked and click[2].collidepoint(event.pos):
             introMenu()
         if mouseClicked and click[1].collidepoint(event.pos):
             if gameStats[1] >= 10:
                 gameStats[1] -= 10
+                print(click)
         if mouseClicked and click[0].collidepoint(event.pos):
             if gameStats[1] <= 90:
                 gameStats[1] += 10
@@ -342,6 +361,7 @@ def theGame():
                 gameStats[0] -= gameStats[1]
                 gameStats[2] = 0
                 newBoard = True
+                spin = True
         if doubleUp:
             if mouseClicked and doubleClicked[0].collidepoint(event.pos):
                 doublePressed = True
@@ -366,6 +386,153 @@ def theGame():
 
         pygame.display.update()
         clock.tick(10)
+
+
+def bonusGame():
+    bonusRun = True
+    background = pygame.image.load("Images/background.png")
+    bonusBoard = {}
+    done = {11: False, 12: False, 13: False, 14: False, 15: False, 21: False, 22: False, 23: False, 24: False, 25: False, 31: False, 32: False, 33: False, 34: False, 35: False}
+    newBonusBoard = True
+    clickables = {}
+    bonusOn = True
+    spin = []
+    while bonusRun:
+        mouseClicked = False
+        keyPressed = False
+        pressed = pygame.key.get_pressed()
+        screen.blit(background, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEMOTION:
+                mousex, mousey = event.pos
+                pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mouseClicked = True
+            if event.type == pygame.KEYDOWN:
+                keyPressed = True
+                pressed = pygame.key.get_pressed()
+        if newBonusBoard:
+            fillBonusBoard(bonusBoard)
+            newBonusBoard = False
+
+        boardX = 112
+        boardY = 75
+        pos = 11
+        for item in bonusBoard:
+            if pos == 16:
+                pos = 21
+                boardX = 112
+                boardY += 170
+            elif pos == 26:
+                boardX = 112
+                boardY += 170
+                pos = 31
+            if done[pos] == True:
+                screen.blit(theBonusGuys[int(bonusBoard[str(pos)])], (boardX, boardY))
+            else:
+                theImg = theBonusGuys[6]
+                theRect = theImg.get_rect()
+                theRect.topleft = (boardX, boardY)
+                screen.blit(theBonusGuys[6], theRect)
+                clickables[pos] = theRect
+            boardX += 210
+            pos += 1
+
+
+        balanceDisp = inGameCreditFont.render('%d kr.' % gameStats[0], True, red)
+        balanceRect = balanceDisp.get_rect()
+        balanceRect.topleft = (250, 601)
+        screen.blit(balanceDisp, balanceRect)
+
+        winDisp = inGameCreditFont.render('%d kr.' % gameStats[2], True, red)
+        winRect = winDisp.get_rect()
+        winRect.topleft = (605, 601)
+        screen.blit(winDisp, winRect)
+
+        betDisp = inGameCreditFont.render('%d kr.' % gameStats[1], True, red)
+        betRect = betDisp.get_rect()
+        betRect.topleft = (940, 601)
+        screen.blit(betDisp, betRect)
+
+        plusDisp = inGameCreditFont.render('+', True, red)
+        plusRect = plusDisp.get_rect()
+        plusRect.topleft = (1058, 612)
+        screen.blit(plusDisp, plusRect)
+
+        minusDisp = inGameCreditFont.render('-', True, red)
+        minusRect = minusDisp.get_rect()
+        minusRect.topleft = (867, 612)
+        screen.blit(minusDisp, minusRect)
+
+        if bonusOn == False:
+            spinDisp = creditFont.render('Exit!', True, green)
+            spinRect = spinDisp.get_rect()
+            spinRect.topleft = (1160, 670)
+            screen.blit(spinDisp, spinRect)
+
+            homeDisp = creditFont.render('Home', True, green)
+            homeRect = homeDisp.get_rect()
+            homeRect.topleft = (25, 670)
+            screen.blit(homeDisp, homeRect)
+
+            spin.append(homeRect)
+            spin.append(spinRect)
+
+            if mouseClicked and spin[0].collidepoint(event.pos):
+                introMenu()
+            elif mouseClicked and spin[1].collidepoint(event.pos):
+                theGame()
+
+
+        if mouseClicked and bonusOn:
+            print(clickables)
+            for pos, rect in clickables.items():
+                if done[pos] == False and clickables[pos].collidepoint(event.pos):
+                    done[pos] = True
+                    print(bonusBoard)
+                    if bonusBoard[str(pos)] == ARNAR:
+                        gameStats[2] += gameStats[1]*3
+                    elif bonusBoard[str(pos)] == ATLI:
+                        gameStats[2] += gameStats[1]*3
+                    elif bonusBoard[str(pos)] == DANIEL:
+                        gameStats[2] += gameStats[1]*3
+                    elif bonusBoard[str(pos)] == MARTIN:
+                        gameStats[2] += gameStats[1]*2
+                    elif bonusBoard[str(pos)] == ULFUR:
+                        gameStats[2] += gameStats[1]*3
+                    elif bonusBoard[str(pos)] == THOR:
+                        gameStats[2] += gameStats[1]*100
+                    elif bonusBoard[str(pos)] == SHIT:
+                        gameStats[0] += gameStats[2]
+                        bonusOn = False
+
+
+        pygame.display.update()
+        clock.tick(10)
+
+def fillBonusBoard(board):
+    arrayOfAll = [ARNAR, ARNAR, ATLI, ATLI, DANIEL, DANIEL, MARTIN, MARTIN, MARTIN, MARTIN, ULFUR, ULFUR, THOR, SHIT, SHIT]
+    left = 14
+    for i in range(1, 16):
+        if i <= 5:
+            rand = randint(0, left)
+            board['1' + str(i)] = arrayOfAll[rand]
+            del arrayOfAll[rand]
+            left -= 1
+        elif i > 5 and i <= 10:
+            rand = randint(0, left)
+            board['2' + str(i-5)] = arrayOfAll[rand]
+            del arrayOfAll[rand]
+            left -= 1
+        else:
+            rand = randint(0, left)
+            board['3' + str(i-10)] = arrayOfAll[rand]
+            del arrayOfAll[rand]
+            left -= 1
 
 
 def fillBoard(board):
@@ -508,7 +675,7 @@ def checkWin(board):
         if value == '9':
             count += 1
     if count >= 3:
-        gameStats[2] += 1000 ##Needs bonus game implementation
+        bonusGame() ##Needs bonus game implementation
 
     # #Hauk's double
     for key, value in board.items():
