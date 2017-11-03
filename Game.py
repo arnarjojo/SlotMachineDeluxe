@@ -212,6 +212,8 @@ def theRules(number):
 
 def theGame():
     pygame.mixer.music.stop()
+    pygame.mixer.music.load("Music/spilakassahljod.mp3")
+    pygame.mixer.music.play(2)
     screen.fill(black)
     mousex = 0
     mousey = 0
@@ -224,6 +226,7 @@ def theGame():
     doublePressed = False
     getDoubleUp = False
     spin = False
+    doubleOnlyOnce = False
     while run:
         mouseClicked = False
         keyPressed = False
@@ -352,30 +355,40 @@ def theGame():
         if mouseClicked and click[1].collidepoint(event.pos):
             if gameStats[1] >= 10:
                 gameStats[1] -= 10
-                print(click)
         if mouseClicked and click[0].collidepoint(event.pos):
             if gameStats[1] <= 90:
                 gameStats[1] += 10
+                pygame.mixer.music.load("Music/super_mario/smb3_coin.mp3")
+                pygame.mixer.music.play(0)
         if mouseClicked and click[3].collidepoint(event.pos):
             if gameStats[1] > 0 and gameStats[0] >= gameStats[1]:
                 gameStats[0] -= gameStats[1]
                 gameStats[2] = 0
                 newBoard = True
                 spin = True
+                doubleOnlyOne = False
+                pygame.mixer.music.load("Music/super_mario/smb3_frog_mario_walk.mp3")
+                pygame.mixer.music.play(0)
         if doubleUp:
             if mouseClicked and doubleClicked[0].collidepoint(event.pos):
                 doublePressed = True
-                if theRandom <= 6:
+                if theRandom <= 6 and doubleOnlyOnce == False:
                     gameStats[0] += gameStats[2]
                     gameStats[2] = gameStats[2]*2
+                    doubleOnlyOnce = True
+                elif theRandom <= 6 and doubleOnlyOnce == True:
+                    gameStats[2] = gameStats[2]
                 else:
                     gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
             elif mouseClicked and doubleClicked[1].collidepoint(event.pos):
                 doublePressed = True
-                if theRandom >= 7:
+                if theRandom >= 7 and doubleOnlyOnce == False:
                     gameStats[0] += gameStats[2]
                     gameStats[2] = gameStats[2]*2
+                    doubleOnlyOnce = True
+                elif theRandom >= 7 and doubleOnlyOnce == True:
+                    gameStats[2] = gameStats[2]
                 else:
                     gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
@@ -394,6 +407,8 @@ def bonusGame():
     bonusBoard = {}
     done = {11: False, 12: False, 13: False, 14: False, 15: False, 21: False, 22: False, 23: False, 24: False, 25: False, 31: False, 32: False, 33: False, 34: False, 35: False}
     newBonusBoard = True
+    pygame.mixer.music.load("Music/partyHorn.mp3")
+    pygame.mixer.music.play(0)
     clickables = {}
     bonusOn = True
     spin = []
@@ -496,18 +511,32 @@ def bonusGame():
                     print(bonusBoard)
                     if bonusBoard[str(pos)] == ARNAR:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/AmericaFuckYeahCut.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == ATLI:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/super_mario/smb3_1-up.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == DANIEL:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/happy.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == MARTIN:
                         gameStats[2] += gameStats[1]*2
+                        pygame.mixer.music.load("Music/OpenCan.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == ULFUR:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/Whistle.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == THOR:
                         gameStats[2] += gameStats[1]*100
+                        pygame.mixer.music.load("Music/Fireworks.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == SHIT:
                         gameStats[0] += gameStats[2]
+                        pygame.mixer.music.load("Music/dabbiShit.mp3")
+                        pygame.mixer.music.play(0)
                         bonusOn = False
 
 
@@ -558,21 +587,31 @@ def checkWin(board):
             temp = board[str(i)]
             if i >= 13:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
+
         elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 13:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
     temp = board['21']
+
     for i in range(22,26):
         if temp == '7':
             temp = board[str(i)]
             if i >= 23:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 23:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -582,9 +621,13 @@ def checkWin(board):
             temp = board[str(i)]
             if i >= 33:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 33:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -596,9 +639,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -609,9 +656,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -623,9 +674,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -636,9 +691,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -650,9 +709,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 2:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 2:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -663,9 +726,13 @@ def checkWin(board):
             temp = board[str(i)]
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         elif temp == board[i] or board[i] == '7':
             if tempArr.index(i) >= 1:
                 gameStats[2] += gameStats[1]
+                pygame.mixer.music.load("Music/Win.mp3")
+                pygame.mixer.music.play(1)
         else:
             break
 
@@ -675,7 +742,7 @@ def checkWin(board):
         if value == '9':
             count += 1
     if count >= 3:
-        bonusGame() ##Needs bonus game implementation
+        bonusGame()
 
     # #Hauk's double
     for key, value in board.items():
