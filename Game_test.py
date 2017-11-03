@@ -212,6 +212,8 @@ def theRules(number):
 
 def theGame():
     pygame.mixer.music.stop()
+    pygame.mixer.music.load("Music/spilakassahljod.mp3")
+    pygame.mixer.music.play(2)
     screen.fill(black)
     mousex = 0
     mousey = 0
@@ -359,7 +361,7 @@ def theGame():
         if mouseClicked and click[0].collidepoint(event.pos):
             if gameStats[1] <= 90:
                 gameStats[1] += 10
-                pygame.mixer.music.load("Music/Cashin.mp3")
+                pygame.mixer.music.load("Music/super_mario/smb3_coin.mp3")
                 pygame.mixer.music.play(0)
         if mouseClicked and click[3].collidepoint(event.pos):
             if gameStats[1] > 0 and gameStats[0] >= gameStats[1]:
@@ -367,7 +369,7 @@ def theGame():
                 gameStats[2] = 0
                 newBoard = True
                 spin = True
-                pygame.mixer.music.load("Music/spinJump.mp3")
+                pygame.mixer.music.load("Music/super_mario/smb3_frog_mario_walk.mp3")
                 pygame.mixer.music.play(0)
         if doubleUp:
             if mouseClicked and doubleClicked[0].collidepoint(event.pos):
@@ -509,23 +511,27 @@ def bonusGame():
                         pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == ATLI:
                         gameStats[2] += gameStats[1]*3
-                        pygame.mixer.music.load("Music/Whistle.mp3")
+                        pygame.mixer.music.load("Music/super_mario/smb3_1-up.mp3")
                         pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == DANIEL:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/danni.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == MARTIN:
                         gameStats[2] += gameStats[1]*2
                         pygame.mixer.music.load("Music/OpenCan.mp3")
                         pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == ULFUR:
                         gameStats[2] += gameStats[1]*3
+                        pygame.mixer.music.load("Music/Whistle.mp3")
+                        pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == THOR:
                         gameStats[2] += gameStats[1]*100
                         pygame.mixer.music.load("Music/Fireworks.mp3")
                         pygame.mixer.music.play(0)
                     elif bonusBoard[str(pos)] == SHIT:
                         gameStats[0] += gameStats[2]
-                        pygame.mixer.music.load("Music/Toilet.mp3")
+                        pygame.mixer.music.load("Music/dabbiShit.mp3")
                         pygame.mixer.music.play(0)
                         bonusOn = False
 
@@ -577,6 +583,7 @@ def checkWin(board):
             temp = board[str(i)]
             if i >= 13:
                 gameStats[2] += gameStats[1]
+
         elif temp == board[str(i)] or board[str(i)] == '7':
             if i >= 13:
                 gameStats[2] += gameStats[1]
