@@ -288,6 +288,7 @@ def theGame():
                 else:
                     doublePressed = False
                     doubleUp = False
+                    doubleOnlyOnce = False
 
             redDisp = font.render('Red' , True, red)
             redRect = redDisp.get_rect()
@@ -366,7 +367,7 @@ def theGame():
                 gameStats[2] = 0
                 newBoard = True
                 spin = True
-                doubleOnlyOne = False
+                doubleOnlyOnce = False
                 pygame.mixer.music.load("Music/super_mario/smb3_frog_mario_walk.mp3")
                 pygame.mixer.music.play(0)
         if doubleUp:
