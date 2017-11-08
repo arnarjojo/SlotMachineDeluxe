@@ -100,7 +100,7 @@ chances['5'] = 7
 chances['6'] = 7
 chances['7'] = 2
 chances['8'] = 1
-chances['9'] = 2
+chances['9'] = 7
 
 
 font = pygame.font.Font('Fonts/freesansbold.ttf', 30)
@@ -277,7 +277,7 @@ def theGame():
             elif event.type == pygame.KEYDOWN:
                 if event.key == 27:
                     introMenu()
-                elif event.key == 32:
+                elif event.key == 32 or event.key == 13:
                     spinPlz = True
                 elif event.key == 270:
                     higher = True
@@ -446,37 +446,42 @@ def theGame():
         pygame.display.update()
         clock.tick(10)
 
-def checkWho(done, board, number, bonusOn):
+def checkWho(done, board, number):
     if board[str(number)] == ARNAR and done[number] == False:
         gameStats[2] += gameStats[1]*3
         pygame.mixer.music.load("Music/AmericaFuckYeahCut.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == ATLI and done[number] == False:
         gameStats[2] += gameStats[1]*3
         pygame.mixer.music.load("Music/super_mario/smb3_1-up.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == DANIEL and done[number] == False:
         gameStats[2] += gameStats[1]*3
         pygame.mixer.music.load("Music/happy.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == MARTIN and done[number] == False:
         gameStats[2] += gameStats[1]*2
         pygame.mixer.music.load("Music/OpenCan.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == ULFUR and done[number] == False:
         gameStats[2] += gameStats[1]*3
         pygame.mixer.music.load("Music/Whistle.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == THOR and done[number] == False:
         gameStats[2] += gameStats[1]*100
         pygame.mixer.music.load("Music/Fireworks.mp3")
         pygame.mixer.music.play(0)
+        return True
     elif board[str(number)] == SHIT and done[number] == False:
         gameStats[0] += gameStats[2]
         pygame.mixer.music.load("Music/dabbiShit.mp3")
         pygame.mixer.music.play(0)
-        bonusOn = False
-    done[number] == True
+        return False
         
 def bonusGame():
     bonusRun = True
@@ -507,37 +512,58 @@ def bonusGame():
             elif event.type == pygame.MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and bonusOn:
                 if event.key == 113:
-                    checkWho(done, bonusBoard, 11, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 11)
+                    done[11] = True
                 elif event.key == 119:
-                    checkWho(done, bonusBoard, 12, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 12)
+                    done[12] = True
                 elif event.key == 101:
-                    checkWho(done, bonusBoard, 13, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 13)
+                    done[13] = True
                 elif event.key == 114:
-                    checkWho(done, bonusBoard, 14, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 14)
+                    done[14] = True
                 elif event.key == 116:
-                    checkWho(done, bonusBoard, 15, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 15)
+                    done[15] = True
                 elif event.key == 97:
-                    checkWho(done, bonusBoard, 21, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 21)
+                    done[21] = True
                 elif event.key == 115:
-                    checkWho(done, bonusBoard, 22, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 22)
+                    done[22] = True
                 elif event.key == 100:
-                    checkWho(done, bonusBoard, 23, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 23)
+                    done[23] = True
                 elif event.key == 102:
-                    checkWho(done, bonusBoard, 24, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 24)
+                    done[24] = True
                 elif event.key == 103:
-                    checkWho(done, bonusBoard, 25, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 25)
+                    done[25] = True
                 elif event.key == 122:
-                    checkWho(done, bonusBoard, 31, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 31)
+                    done[31] = True
                 elif event.key == 120:
-                    checkWho(done, bonusBoard, 32, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 32)
+                    done[32] = True
                 elif event.key == 99:
-                    checkWho(done, bonusBoard, 33, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 33)
+                    done[33] = True
                 elif event.key == 118:
-                    checkWho(done, bonusBoard, 34, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 34)
+                    done[34] = True
                 elif event.key == 98:
-                    checkWho(done, bonusBoard, 35, bonusOn)
+                    bonusOn = checkWho(done, bonusBoard, 35)
+                    done[35] = True
+            if event.type == pygame.KEYDOWN and bonusOn == False:
+                if event.key == 27:
+                    introMenu()
+                elif event.key == 32 or event.key == 13:
+                    theGame()
+        
         boardX = 112
         boardY = 75
         pos = 11
