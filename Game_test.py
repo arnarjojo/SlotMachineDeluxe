@@ -8,7 +8,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 
-initCredit = 0
+initCredit = 1000
 initBet = 100
 initWin = 0
 
@@ -118,6 +118,8 @@ def introMenu():
     pygame.mixer.music.play(-1)
     while run:
         mouseClicked = False
+        runGame = False
+        higher = False
         screen.blit(bg, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -125,7 +127,19 @@ def introMenu():
                 quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 mouseClicked = True
-
+            elif event.type == pygame.KEYDOWN:
+                if event.key == 13:
+                    theGame()
+                elif event.key == 270:
+                    higher = True
+                elif event.key == 269:
+                    if gameStats[0] >= 1000:
+                        gameStats[0] -= 1000
+                elif event.key == 104 or event.key == 114:
+                    theRules(1)
+                elif event.key == 113:
+                    pygame.quit()
+                    quit()
         x = display_width / 3.6
         y = display_height / 1.33
         # isClick = stores location of menu items "rect"
@@ -152,15 +166,15 @@ def introMenu():
                 y += 3
             isClick.append(texR)
         # clickable menu items
-        if mouseClicked and isClick[0].collidepoint(event.pos):
+        if (mouseClicked and isClick[0].collidepoint(event.pos)) or runGame == True:
             theGame()
         if mouseClicked and isClick[1].collidepoint(event.pos):
             theRules(1)
         if mouseClicked and isClick[2].collidepoint(event.pos):
             pygame.quit()
             quit()
-        if mouseClicked and isClick[3].collidepoint(event.pos):
-            if gameStats[0] < 5000:
+        if mouseClicked and isClick[3].collidepoint(event.pos) or higher:
+            if gameStats[0] < 10000:
                 gameStats[0] += 1000
 
         pygame.display.update()
@@ -183,6 +197,19 @@ def theRules(number):
                 quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 mouseClicked = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == 27:
+                    introMenu()
+                elif event.key == 275:
+                    if number < 3:
+                        theRules(number+1)
+                    else:
+                        theRules(1)
+                elif event.key == 276:
+                    if number == 1:
+                        theRules(3)
+                    else:
+                        theRules(number-1)
 
         clickable = []
 
@@ -230,6 +257,11 @@ def theGame():
     while run:
         mouseClicked = False
         keyPressed = False
+        spinPlz = False
+        doubleByKey = False
+        blackPlz = False
+        redPlz = False
+        higher = False
         pressed = pygame.key.get_pressed()
         screen.blit(background, (0, 0))
         for event in pygame.event.get():
@@ -242,10 +274,24 @@ def theGame():
             elif event.type == pygame.MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
-            if event.type == pygame.KEYDOWN:
-                keyPressed = True
-                pressed = pygame.key.get_pressed()
-
+            elif event.type == pygame.KEYDOWN:
+                if event.key == 27:
+                    introMenu()
+                elif event.key == 32:
+                    spinPlz = True
+                elif event.key == 270:
+                    higher = True
+                elif event.key == 269:
+                    if gameStats[1] >= 10:
+                        gameStats[1] -= 10
+                elif event.key == 100 and gameStats[0] > 0:
+                    doubleByKey = True
+                    doubleOnlyOnce = False
+                elif event.key == 114 or event.key == 275:
+                    redPlz = True
+                elif event.key == 98 or event.key == 276:
+                    blackPlz = True
+                
         click = []
         if newBoard:
             fillBoard(board)
@@ -288,7 +334,6 @@ def theGame():
                 else:
                     doublePressed = False
                     doubleUp = False
-                    doubleOnlyOnce = False
 
             redDisp = font.render('Red' , True, red)
             redRect = redDisp.get_rect()
@@ -356,22 +401,22 @@ def theGame():
         if mouseClicked and click[1].collidepoint(event.pos):
             if gameStats[1] >= 10:
                 gameStats[1] -= 10
-        if mouseClicked and click[0].collidepoint(event.pos):
+        if mouseClicked and click[0].collidepoint(event.pos) or higher:
             if gameStats[1] <= 90:
                 gameStats[1] += 10
                 pygame.mixer.music.load("Music/super_mario/smb3_coin.mp3")
                 pygame.mixer.music.play(0)
-        if mouseClicked and click[3].collidepoint(event.pos):
+        if mouseClicked and click[3].collidepoint(event.pos) or spinPlz:
             if gameStats[1] > 0 and gameStats[0] >= gameStats[1]:
                 gameStats[0] -= gameStats[1]
                 gameStats[2] = 0
                 newBoard = True
                 spin = True
-                doubleOnlyOnce = False
+                doubleOnlyOne = False
                 pygame.mixer.music.load("Music/super_mario/smb3_frog_mario_walk.mp3")
                 pygame.mixer.music.play(0)
         if doubleUp:
-            if mouseClicked and doubleClicked[0].collidepoint(event.pos):
+            if mouseClicked and doubleClicked[0].collidepoint(event.pos) or redPlz:
                 doublePressed = True
                 if theRandom <= 6 and doubleOnlyOnce == False:
                     gameStats[0] += gameStats[2]
@@ -382,7 +427,7 @@ def theGame():
                 else:
                     gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
-            elif mouseClicked and doubleClicked[1].collidepoint(event.pos):
+            elif mouseClicked and doubleClicked[1].collidepoint(event.pos) or blackPlz:
                 doublePressed = True
                 if theRandom >= 7 and doubleOnlyOnce == False:
                     gameStats[0] += gameStats[2]
@@ -394,14 +439,45 @@ def theGame():
                     gameStats[0] -= gameStats[2]
                     gameStats[2] = 0
         if len(clicked) > 0:
-            if mouseClicked and clicked[0].collidepoint(event.pos) and gameStats[2] > 0:
+            if mouseClicked and clicked[0].collidepoint(event.pos) and gameStats[2] > 0 or doubleByKey:
                 doubleUp = True
                 getDoubleUp = True
 
         pygame.display.update()
         clock.tick(10)
 
-
+def checkWho(done, board, number, bonusOn):
+    if board[str(number)] == ARNAR and done[number] == False:
+        gameStats[2] += gameStats[1]*3
+        pygame.mixer.music.load("Music/AmericaFuckYeahCut.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == ATLI and done[number] == False:
+        gameStats[2] += gameStats[1]*3
+        pygame.mixer.music.load("Music/super_mario/smb3_1-up.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == DANIEL and done[number] == False:
+        gameStats[2] += gameStats[1]*3
+        pygame.mixer.music.load("Music/happy.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == MARTIN and done[number] == False:
+        gameStats[2] += gameStats[1]*2
+        pygame.mixer.music.load("Music/OpenCan.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == ULFUR and done[number] == False:
+        gameStats[2] += gameStats[1]*3
+        pygame.mixer.music.load("Music/Whistle.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == THOR and done[number] == False:
+        gameStats[2] += gameStats[1]*100
+        pygame.mixer.music.load("Music/Fireworks.mp3")
+        pygame.mixer.music.play(0)
+    elif board[str(number)] == SHIT and done[number] == False:
+        gameStats[0] += gameStats[2]
+        pygame.mixer.music.load("Music/dabbiShit.mp3")
+        pygame.mixer.music.play(0)
+        bonusOn = False
+    done[number] == True
+        
 def bonusGame():
     bonusRun = True
     background = pygame.image.load("Images/background.png")
@@ -418,6 +494,9 @@ def bonusGame():
         keyPressed = False
         pressed = pygame.key.get_pressed()
         screen.blit(background, (0, 0))
+        if newBonusBoard:
+            fillBonusBoard(bonusBoard)
+            newBonusBoard = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -429,12 +508,36 @@ def bonusGame():
                 mousex, mousey = event.pos
                 mouseClicked = True
             if event.type == pygame.KEYDOWN:
-                keyPressed = True
-                pressed = pygame.key.get_pressed()
-        if newBonusBoard:
-            fillBonusBoard(bonusBoard)
-            newBonusBoard = False
-
+                if event.key == 113:
+                    checkWho(done, bonusBoard, 11, bonusOn)
+                elif event.key == 119:
+                    checkWho(done, bonusBoard, 12, bonusOn)
+                elif event.key == 101:
+                    checkWho(done, bonusBoard, 13, bonusOn)
+                elif event.key == 114:
+                    checkWho(done, bonusBoard, 14, bonusOn)
+                elif event.key == 116:
+                    checkWho(done, bonusBoard, 15, bonusOn)
+                elif event.key == 97:
+                    checkWho(done, bonusBoard, 21, bonusOn)
+                elif event.key == 115:
+                    checkWho(done, bonusBoard, 22, bonusOn)
+                elif event.key == 100:
+                    checkWho(done, bonusBoard, 23, bonusOn)
+                elif event.key == 102:
+                    checkWho(done, bonusBoard, 24, bonusOn)
+                elif event.key == 103:
+                    checkWho(done, bonusBoard, 25, bonusOn)
+                elif event.key == 122:
+                    checkWho(done, bonusBoard, 31, bonusOn)
+                elif event.key == 120:
+                    checkWho(done, bonusBoard, 32, bonusOn)
+                elif event.key == 99:
+                    checkWho(done, bonusBoard, 33, bonusOn)
+                elif event.key == 118:
+                    checkWho(done, bonusBoard, 34, bonusOn)
+                elif event.key == 98:
+                    checkWho(done, bonusBoard, 35, bonusOn)
         boardX = 112
         boardY = 75
         pos = 11
@@ -505,11 +608,9 @@ def bonusGame():
 
 
         if mouseClicked and bonusOn:
-            print(clickables)
             for pos, rect in clickables.items():
                 if done[pos] == False and clickables[pos].collidepoint(event.pos):
                     done[pos] = True
-                    print(bonusBoard)
                     if bonusBoard[str(pos)] == ARNAR:
                         gameStats[2] += gameStats[1]*3
                         pygame.mixer.music.load("Music/AmericaFuckYeahCut.mp3")
@@ -545,7 +646,7 @@ def bonusGame():
         clock.tick(10)
 
 def fillBonusBoard(board):
-    arrayOfAll = [ARNAR, ARNAR, ATLI, ATLI, DANIEL, DANIEL, MARTIN, MARTIN, MARTIN, MARTIN, ULFUR, ULFUR, THOR, SHIT, SHIT]
+    arrayOfAll = [ARNAR, ARNAR, ATLI, ATLI, DANIEL, DANIEL, DANIEL, ARNAR, MARTIN, MARTIN, ULFUR, ULFUR, THOR, SHIT, SHIT]
     left = 14
     for i in range(1, 16):
         if i <= 5:
